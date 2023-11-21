@@ -1,0 +1,123 @@
+
+// Gradle语法操作
+task grammar {
+    println("------------------------------- grammar ------------------------------")
+    println()
+}
+
+//def声明变量
+task stringText {
+    def a = 1;
+    def b = "hello world";
+    def int c = 1;
+
+    def str1 = "hellow"
+    def str2 = 'world'
+    println(str1 + str2)
+}
+
+//def声明方法
+task method {
+    println "methodA  " + methodA(6, 4)
+}
+//定义方法
+def methodA(int a, int b) {
+    //虽然没有返回值，但这里函数在没有return的情况下，默认返回了最后一行的值
+    a + b
+}
+
+//转大写字符
+task upper {
+    String someStr = "mY_naMe"
+    println("upper case: " + someStr.toUpperCase())
+}
+//打印 upper case: MY_NAME
+
+//遍历次数
+task count {
+    4.times {
+        print(it + "")
+    }
+    println()
+}
+//打印 0123
+
+//list map操作，数据结构的使用使用java的代码
+task listMap {
+    List<String> list = new ArrayList<>()
+    list.add("data1")
+    list.add("data2")
+    list.add("data3")
+    println("listSize: " + list.size())
+    list.forEach() {
+        println(it)
+    }
+
+    Map<String, String> map = [key1: 'value1', key2: 'value2']
+    map.each {
+        println(it.key + " " + it.value)
+    }
+}
+//打印  listSize: 3
+//key1 value1
+//key2 value2
+
+//闭包
+def mEach(closure) {
+    for (int i in 1..5) {
+        closure(i)
+    }
+}
+def mEachWithParams(closure) {
+    def map = ['name':'zhangsan', 'age': '18']
+    map.each {
+        closure(it.key, it.value)
+    }
+}
+task closureTask {
+    mEach({
+        println("当前  " + it)
+    })
+
+    mEachWithParams ({key, value ->
+        println(key + " is " + value)
+    })
+}
+
+//配置对象属性
+class UserInfo {
+    String userName
+    String age
+}
+task user {
+    def user = configure(new UserInfo()) {
+        userName = "hahaha"
+        age = 10
+    }
+    user.with {
+        userName = "hahahahaha"
+        age = 12
+    }
+    println user.userName + "  " + user.age
+}
+
+//switch判断,支持更多的参数类型
+def object = 1
+def result = ""
+switch (object) {
+    case "foo": result = "found foo"
+        break
+    case "bar": result += "bar"
+        brek
+    case [4, 5, 6, 'inList']: result = "list"
+        break
+    case 12..30: result = "range"
+        break
+    case Integer: result = "integer"
+        break
+    case Number: result = "number"
+        break
+    case { it > 3 }: result = "number > 3"
+        break
+    default: result = "default"
+}

@@ -3,6 +3,13 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+//使用其他的构建脚本配置项目
+apply from: 'grammar.gradle'
+apply from: 'task.gradle'
+apply from: 'project.gradle'
+apply from: 'file.gradle'
+apply from: 'extension.gradle'
+
 android {
     namespace 'com.example.gradlestudy'
     compileSdk 32

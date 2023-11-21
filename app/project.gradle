@@ -1,0 +1,45 @@
+
+//Gradle Project操作
+
+task projectUse {
+    println("------------------------------- projectUse ------------------------------")
+    println()
+}
+
+//获取project下配置仓库
+task showRepos {
+    def repos = repositories.collect {
+        println it.name
+    }
+    doLast {
+        println "all repos"
+        println repos
+    }
+}
+
+//获取project属性
+task projectParams {
+    println "projectParams: "  + project.name + " " + project.path + " " + project.description
+}
+//打印  rojectParams: app :app null
+
+//配置project build路径
+task buildDir {
+    println project.buildDir
+    project.setBuildDir('src')
+    println project.buildDir
+}
+
+//注册删除buildDir目录task
+tasks.register('myClean', Delete) {
+    delete buildDir
+}
+
+//project的各种属性
+task printProject {
+    println "project的各种属性: "
+    println project.rootProject
+    println project.projectDir.name + " -- " + project.projectDir.path
+    println project.buildDir.path
+    println project.name + " -  " + project.description
+}

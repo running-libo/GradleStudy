@@ -1,0 +1,87 @@
+
+//Gradle Task操作
+
+task taskUse {
+    println("------------------------------- taskUse ------------------------------")
+    println()
+}
+
+//task依赖
+task hello {
+    println 'Hello world!'
+}
+task fine(dependsOn: hello) {
+    println 'I am fine'
+}
+//打印 Hello world!  I am fine
+
+//自定义任务属性，用ext声明
+task myTask {
+    ext.myProperty = "myValue"
+}
+task printTaskProperty {
+    println(myTask.myProperty)
+}
+//打印  myValue
+
+//扩展属性
+ext {
+    versionExt = "1.0.2"
+    email = "test@gihhub.com"
+}
+task extParams {
+    println versionExt + " " + email
+}
+//打印  1.0.2 test@gihhub.com
+
+//定位 tasks
+task location {
+    //通过属性获取task
+    println(project.hello.name)
+    //通过tasks 集合 获取 task
+    println(tasks['hello'].name)
+}
+//打印  hello  hello
+
+//配置一个任务 - 通过闭包 closure
+task myCopy(type: Copy)
+myCopy {
+    println("myCopy task")
+}
+//打印  myCopy task
+
+// "must run after" 和 "should run after".
+task taskX {
+    println 'taskX'
+}
+task taskY {
+    println 'taskY'
+}
+taskX.mustRunAfter taskY
+taskX.shouldRunAfter taskY
+//打印 taskX  taskY
+
+//给任务加入描述
+task description {
+    description '这是一个task的description'
+    println description
+}
+//打印 这是一个task的description
+
+//抛出一个RuntimeException异常
+task stopException {
+//    throw new RuntimeException()
+}
+
+//激活和注销 tasks
+task disableMe {
+    println 'disableMe'
+}
+disableMe.enabled = false
+
+//通过 gradle.properties 文件设置属性
+task printProperties {
+    println gradlePropertiesProp  //gradle属性
+    println System.properties['system']  //system属性
+}
+//打印 gradlePropertiesValue   systemValue
