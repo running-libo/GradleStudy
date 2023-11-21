@@ -1,0 +1,35 @@
+import groovy.xml.XmlParser
+
+task fileUse {
+    println("------------------------------- fileUse ------------------------------")
+    println()
+}
+
+//根据一个 XML 文件生成多个输出文件
+task transform {
+    def srcFile = file('mountains.xml')
+    def destDir = new File(buildDir, 'generated')  //buildDir为build编译文件目录，'generated'为generated目录
+    doLast {
+        println "transforming source file."
+        destDir.mkdirs()
+        def mountains = new XmlParser().parse(srcFile)
+        mountains.children().each {
+            def name = it.name()
+            def destFile = new File(destDir, "${name}.txt")
+            destFile.text = "$it.name()"
+        }
+    }
+}
+
+//读写gradle.properties文件属性
+task propertiesWrite {
+    def defaultProps = new Properties()
+    def propertiFile = new File(rootDir, "gradle.properties") //根目录下gradle.properties文件
+    def inputStream = propertiFile.newDataInputStream()
+    defaultProps.load(inputStream)  //Properties读取文件流
+
+    defaultProps.setProperty("version", "1.1.0") //properti设置新属性
+    def version = defaultProps.getProperty("version")  //properti读取新属性
+
+    println("当前配置 version: " + version)
+}

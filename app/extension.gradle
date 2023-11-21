@@ -1,0 +1,16 @@
+
+
+task extensionUse {
+    println("------------------------------- extensionUse ------------------------------")
+    println()
+}
+
+//在project中添加一个名为groupId的属性
+project.ext.groupId = "groupId"
+// 使用ext块添加属性
+ext {
+    artifactId='EasyDependency'
+    config=[
+            key:'value'
+    ]
+}

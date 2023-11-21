@@ -15,6 +15,16 @@ task fine(dependsOn: hello) {
 }
 //打印 Hello world!  I am fine
 
+//任务执行开始、结束的代码执行
+task firstLast {
+    doLast {
+        println "doLast"
+    }
+    doFirst {
+        println "doFirst"
+    }
+}
+
 //自定义任务属性，用ext声明
 task myTask {
     ext.myProperty = "myValue"
@@ -85,3 +95,49 @@ task printProperties {
     println System.properties['system']  //system属性
 }
 //打印 gradlePropertiesValue   systemValue
+
+//采用 Project.task(String name) 方法来创建
+project.task("myTask3").doLast {
+    println "doLast in task3"
+}
+
+//task类型：  包括 Copy Delete
+task copyFile(type: Copy) {
+    from 'xml'
+    into 'destination'
+}
+
+//自定义Task
+//使用自定义task，并通过constructorArgs参数来指定构造函数的参数值
+task hello1(type: SayHelloTask, constructorArgs:[30]) {
+    destDir = file("$buildDir/outputFile")
+    sayHello() //在task中调用该task的方法
+}
+task hello2(type: SayHelloTask, constructorArgs:[18]) {
+    msg = "libo" //在task中设置该task的属性
+    sayHello()
+}
+//Hello,defualt name, My age is 30
+//打印  Hello,libo, My age is 18
+
+
+//配置TaskInputs、TaskOutputs 增量构建
+//第2次运行时，test1 task 并没有运行，而是被标记为 up-to-date，而 test2 task 则每次都会运行，这就是典型的增量构建。
+task test1 {
+    //设置inputs
+    inputs.property("name", "hjy")
+    inputs.property("age", 20)
+    //设置outputs
+    outputs.file("$buildDir/test.txt")
+
+    doLast {
+        println "exec task task1"
+    }
+}
+
+task test2 {
+    doLast {
+        println "exec task task2"
+    }
+}
+
