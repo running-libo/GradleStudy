@@ -1,5 +1,4 @@
 
-
 task extensionUse {
     println("------------------------------- extensionUse ------------------------------")
     println()
@@ -41,3 +40,151 @@ task extParams {
         it.key + it.value
     }
 }
+
+//创建自定义Extension
+class MyDefaultConfig {
+    String applicationId
+    String versionCode
+    String versionName
+    int targetSdkVersion
+    @Override
+    String toString() {
+        return "applicationId = $applicationId , versionCode = $versionCode, versionName = $versionName, targetSdkVersion = $targetSdkVersion"
+    }
+}
+//创建一个名为 myDefaultConfig 的Extension，每个 Extension 实际上与某个类是相关联的
+getExtensions().create("myDefaultConfig", MyDefaultConfig)
+//配置extention
+myDefaultConfig {
+    //myDefaultConfig里面能配置的属性与类 MyDefaultConfig 中的字段是一致的
+    applicationId = "com.example"
+    versionName = "1.0.1"
+    versionCode = "1"
+    targetSdkVersion 31
+}
+task taskExt {
+    //能直接通过 project 获取到自定义的 Extension
+    println project.myDefaultConfig
+}
+//打印 applicationId = com.example , versionCode = 1, versionName = 1.0.1, targetSdkVersion = 31
+
+
+//父类
+class Animal {
+    String username
+    int legs
+    Animal(String name) {
+        username = name
+    }
+
+    void setLegs(int c) {
+        legs = c
+    }
+
+    String toString() {
+        return "This animal is $username, it has ${legs} legs."
+    }
+}
+
+//子类
+class Pig extends Animal {
+    int age
+    String owner
+
+    Pig(int age, String owner) {
+        super("Pig")
+        this.age = age
+        this.owner = owner
+    }
+
+    String toString() {
+        return super.toString() + " Its age is $age, its owner is $owner."
+    }
+}
+//创建的Extension是 暴露出来Animal 类型,创建extension名称是name,该extension的类型是Pig，后面2个是参数
+def aAnimal = getExtensions().create(Animal, "animal", Pig, 5, "pege")
+//创建的Extension是 Pig 类型
+def aPig = getExtensions().create(Pig, "pig", Pig, 3, "joge")
+animal { //注:自定义扩展和属性没有提示
+    legs = 4 //扩展属性配置对象值
+}
+pig {
+    setLegs(2)
+}
+task animalExt {
+    println aAnimal
+    println aPig
+}
+
+
+//  NamedDomainObjectContainer
+//这是领域对象类型定义
+class TestDomainObj {
+    //必须定义一个 name 属性，并且这个属性值初始化以后不要修改
+    String name
+    String msg
+
+    //构造函数必须有一个 name 参数
+    public TestDomainObj(String name) {
+        this.name = name
+    }
+
+    void msg(String msg) {
+        this.msg = msg
+    }
+
+    String toString() {
+        return "name = ${name}, msg = ${msg}"
+    }
+}
+
+//创建一个扩展
+class TestExtension {
+    //定义一个 NamedDomainObjectContainer 属性
+    NamedDomainObjectContainer<TestDomainObj> testDomains
+
+    public TestExtension(org.gradle.api.Project project) {
+        //在构造函数中通过 project.container(...) 方法创建 NamedDomainObjectContainer
+        testDomains = project.container(TestDomainObj)
+    }
+
+    //让其支持 Gradle DSL 语法，注：该方法名要与Extension第二层的name一致
+    void buildTypes(Action<NamedDomainObjectContainer<TestDomainObj>> action) {
+        action.execute(testDomains)
+    }
+
+    void test() {
+        //遍历命名领域对象容器，打印出所有的领域对象值
+        testDomains.all {
+            println(it)
+        }
+    }
+}
+
+//创建一个名为 test 的 Extension
+def testExt = getExtensions().create("myandroid", TestExtension, project)
+//该第三个参数project就传到TestExtention对象的构造参数中
+
+//给 TextExtention对象配置 NamedDomainObjectContainer 属性
+myandroid {
+    buildTypes {
+        release {
+            msg "This is release config"
+        }
+        debug {
+            msg "This is debug config"
+        }
+    }
+}
+
+task nameDomainTask {
+    testExt.test() //执行TextExtention对象的test方法，打印配置的各个属性
+    //domainx配置就成为了默认、必须的name属性 内部配置了msg属性
+}
+//打印
+//name = debug, msg = This is debug config
+//name = release, msg = This is release config
+
+
+
+
