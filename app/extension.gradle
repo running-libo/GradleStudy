@@ -7,10 +7,37 @@ task extensionUse {
 
 //在project中添加一个名为groupId的属性
 project.ext.groupId = "groupId"
-// 使用ext块添加属性
+
+// 使用ext块添加扩展属性
 ext {
+    versionExt = "1.0.2"
+    email = "test@gihhub.com"
     artifactId='EasyDependency'
     config=[
             key:'value'
     ]
+    android = [compileSdkVersion   : 25,
+               buildToolsVersion   : '25.0.0',
+               applicationId       : 'com.youdu',
+               minSdkVersion       : 16,
+               targetSdkVersion    : 23,
+               versionCode         : 1,
+               versionName         : '1.0.0']
+    signConfigs = ['storeFile'    : 'abc.jks',
+                   'storePassword': '123456',
+                   'keyAlias'     : 'abc',
+                   'keyPassword'  : '123456']
+    dependence = ['libSupportV7'           : 'com.android.support:appcompat-v7:25.0.0',
+                  'libSupportMultidex'     : 'com.android.support:multidex:1.0.1']
+}
+
+//打印各个扩展属性
+task extParams {
+    println versionExt + " " + email
+    println android.each {
+        it.key + it.value
+    }
+    println dependence.each {
+        it.key + it.value
+    }
 }

@@ -6,6 +6,40 @@ task projectUse {
     println()
 }
 
+//project类相关操作
+task allProject {
+
+    //获取所有project
+    getAllprojects().eachWithIndex { Project entry, int i ->
+        println "project: " + i + " name: " + entry.name
+    }
+
+    //获取父project
+    if (getParent() == null) {
+        println "我是根project，所以我没有父project !!! "
+    } else {
+        println "获得父project : " + this.getParent().name
+    }
+
+    //获取根project
+    println("rootProject: " + getRootProject().name)
+}
+
+//对当前节点project和所有子project进行配置
+allProject {
+    group 'com.example'
+    version '1.1.0-beta'
+}
+println project.group
+println project.version
+
+//对所有子project的配置 (不包含当前的project)
+subprojects { Project project->
+    if (project.plugins.hasPlugin('com.android.library')) {
+        apply from: '../publishToMaven.gradle'
+    }
+}
+
 //获取project下配置仓库
 task showRepos {
     def repos = repositories.collect {

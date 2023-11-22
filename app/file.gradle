@@ -5,21 +5,32 @@ task fileUse {
     println()
 }
 
-//根据一个 XML 文件生成多个输出文件
+//Project.file() 方法能够相对项目目录定位一个文件
+task filePosition {
+    File configFile = file('mountains.xml')
+    configFile = file(configFile.absolutePath)
+    println(configFile.absolutePath)
+    configFile = file(new File('src/build/config.xml'))
+    configFile.mkdirs()
+    println(configFile.absolutePath)
+}
+
+//根据一个 XML ，在build/generated下生成多个输出文件
 task transform {
     def srcFile = file('mountains.xml')
-    def destDir = new File(buildDir, 'generated')  //buildDir为build编译文件目录，'generated'为generated目录
+    def destDir = new File(buildDir, 'generated')
     doLast {
         println "transforming source file."
         destDir.mkdirs()
-        def mountains = new XmlParser().parse(srcFile)
+        def mountains = new XmlParser().parse(srcFile) //解析mountains.xml文件得到节点
         mountains.children().each {
             def name = it.name()
             def destFile = new File(destDir, "${name}.txt")
-            destFile.text = "$it.name()"
+            destFile.text = "$name"
         }
     }
 }
+
 
 //读写gradle.properties文件属性
 task propertiesWrite {
@@ -32,4 +43,52 @@ task propertiesWrite {
     def version = defaultProps.getProperty("version")  //properti读取新属性
 
     println("当前配置 version: " + version)
+}
+//打印  当前配置 version: 1.1.0
+
+//创建文件集合，使用 FileCollection 接口表示文件集合
+task collections {
+    FileCollection collection = files('src/file1.txt', new File('src/file2.txt'), 'src/file3.txt')
+    collection.each {
+        println(it.absolutePath)
+    }
+    def files = collection.files //文件集合转set
+    def list = collection as List //文件集合转list
+    def union = collection + file('src/file4.txt')
+    def different = collection - file('src/file3.txt')
+}
+
+//使用标准输出写入log信息
+task loggerTask {
+    logger.error("error message")
+    logger.info("info message")
+    logger.warn("warn message")
+    logger.debug("debug message")
+    logger.quiet("An info log message which is always logged.")
+    logger.lifecycle("A lifecycle info log message.")
+}
+
+//文件树形操作
+task fileTree {
+    FileTree tree = fileTree('src/main/res')
+
+    //遍历访问文件树的元素
+    tree.visit { element->
+        println "$element.file"
+    }
+}
+
+//复制文件，任务类型为Copy，Copy类的父类定义好了from 和 into函数
+task copyTask(type: Copy) {
+    //因为在copy类型的task下，所以能直接用该task下的函数
+    //包括函数 from to rename fileter等
+    from('src/main/java')  //添加要复制的文件
+    from('mountains.xml') //继续添加要复制的文件
+    from file('src/main/res') //继续添加要复制的文件
+
+    into('src/copyPath') //into表示要拷贝到的文件路径
+
+//    rename { fileName ->  //文件重命名
+//        fileName.relace('','')
+//    }
 }

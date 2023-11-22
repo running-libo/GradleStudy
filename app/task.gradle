@@ -34,16 +34,6 @@ task printTaskProperty {
 }
 //打印  myValue
 
-//扩展属性
-ext {
-    versionExt = "1.0.2"
-    email = "test@gihhub.com"
-}
-task extParams {
-    println versionExt + " " + email
-}
-//打印  1.0.2 test@gihhub.com
-
 //定位 tasks
 task location {
     //通过属性获取task
